@@ -18,23 +18,16 @@ export class PlayerController {
     }
 
     @Post()
-    create(@Body() playerDTO: CreatePlayerDto) : Promise<Player> {
+    create(@Body() playerDTO: CreatePlayerDto): Promise<Player> {
         return new Promise((resolve, reject) => {
             this.playersService.create(playerDTO, (error, result) => {
                 if (error) {
-                    if(error instanceof BadRequestException) {
-                        reject({"code": 400, "message": error.message});
-                    }else if(error instanceof ConflictException) {
-                        reject({"code": 409, "message": error.message});
-                    }else{
-                        reject(error);
-                    }
-                } else {
-                    resolve({"id": result!.id, "rank": result!.rank});
+                    reject(error);
+                    return;
                 }
+                resolve({ id: result!.id, rank: result!.rank });
             });
-        })
-
+        });
     }
 
     @Delete(':id')

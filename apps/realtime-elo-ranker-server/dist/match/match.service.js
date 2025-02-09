@@ -19,21 +19,21 @@ let MatchService = class MatchService {
     publish(matchDTO, callback) {
         this.playerService.findOne(matchDTO.winner, (err, winner) => {
             if (err || !winner)
-                return callback(new Error(`Player ${matchDTO.winner} not found`));
+                return callback(new common_1.UnprocessableEntityException(`Player ${matchDTO.winner} not found`));
             this.playerService.findOne(matchDTO.loser, (err, loser) => {
                 if (err || !loser)
-                    return callback(new Error(`Player ${matchDTO.loser} not found`));
+                    return callback(new common_1.UnprocessableEntityException(`Player ${matchDTO.loser} not found`));
                 console.log(matchDTO.loser, "loser");
                 console.log(loser, "bouh");
                 [winner.rank, loser.rank] = this.calculateElo(winner.rank, loser.rank);
                 Promise.all([
                     this.playerService.updateRank(winner.id, winner.rank, (err, player_winner) => {
                         if (err)
-                            return callback(err);
+                            return callback(new common_1.UnprocessableEntityException(err.message));
                     }),
                     this.playerService.updateRank(loser.id, loser.rank, (err, player_loser) => {
                         if (err)
-                            return callback(err);
+                            return callback(new common_1.UnprocessableEntityException(err.message));
                     }),
                 ]).then(() => {
                     let res = {

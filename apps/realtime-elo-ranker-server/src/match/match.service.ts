@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { MatchResultDTO, PublishMatchDto } from './dto/post-match.dto';
 import { PlayerService } from '../players/players.service';
 import { Player } from '../typeorm/entities/player.entity';
@@ -10,12 +10,12 @@ export class MatchService {
     publish(matchDTO: PublishMatchDto, callback: (err: any, result?: MatchResultDTO) => void): void {
         // Récupérer le gagnant
         this.playerService.findOne(matchDTO.winner, (err, winner) => {
-            if (err || !winner) return callback(new Error(`Player ${matchDTO.winner} not found`));
+            if (err || !winner) return callback(new UnprocessableEntityException(`Player ${matchDTO.winner} not found`));
 
             // Récupérer le perdant
             
             this.playerService.findOne(matchDTO.loser, (err, loser) => {
-                if (err || !loser) return callback(new Error(`Player ${matchDTO.loser} not found`));
+                if (err || !loser) return callback(new UnprocessableEntityException(`Player ${matchDTO.loser} not found`));
 
                 // Calcul du nouveau classement ELO
                 console.log(matchDTO.loser, "loser");
@@ -25,10 +25,10 @@ export class MatchService {
                 // Mettre à jour les rangs
                 Promise.all([
                     this.playerService.updateRank(winner.id, winner.rank, (err, player_winner) => {
-                        if (err) return callback(err);
+                        if (err) return callback(new UnprocessableEntityException(err.message));
                     }),
                     this.playerService.updateRank(loser.id, loser.rank, (err, player_loser) => {
-                        if (err) return callback(err);
+                        if (err) return callback(new UnprocessableEntityException(err.message));
                     }),
                 ]).then(() => {
                     let res  = {

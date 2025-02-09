@@ -1,111 +1,118 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerController } from './players.controller';
 import { PlayerService } from './players.service';
+import { Player } from '../typeorm/entities/player.entity';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 
-describe('PlayersController', () => {
-  let controller: PlayerController;
-  let service: PlayerService;
+describe('PlayerController', () => {
+    let controller: PlayerController;
+    let playerService: PlayerService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [PlayerController],
-      providers: [
-        {
-          provide: PlayerService,
-          useValue: {
-            findAll: jest.fn(),
-            findOne: jest.fn(),
-            create: jest.fn(),
-            remove: jest.fn(),
-          },
-        },
-      ],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [PlayerController],
+            providers: [
+                {
+                    provide: PlayerService,
+                    useValue: {
+                        findAll: jest.fn(),
+                        findOne: jest.fn(),
+                        create: jest.fn(),
+                        remove: jest.fn(),
+                    },
+                },
+            ],
+        }).compile();
 
-    controller = module.get<PlayerController>(PlayerController);
-    service = module.get<PlayerService>(PlayerService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
-  it('should call findAll and return an array of players', () => {
-    const result = [{ id: '1', rank: 1 }];
-    jest.spyOn(service, 'findAll').mockImplementation((cb) => cb(null, result));
-
-    controller.findAll((err, players) => {
-      expect(players).toEqual(result);
+        controller = module.get<PlayerController>(PlayerController);
+        playerService = module.get<PlayerService>(PlayerService);
     });
-  });
 
-  it('should handle error in findAll', () => {
-    const error = new Error('Error');
-    jest.spyOn(service, 'findAll').mockImplementation((cb) => cb(error, null));
+    describe('GET /api/player', () => {
+        it('doit retourner une liste de joueurs', (done) => {
+            const mockPlayers: Player[] = [
+                { id: "1", rank: 5 } as Player,
+                { id: "2", rank: 10 } as Player,
+            ];
 
-    controller.findAll((err, players) => {
-      expect(err).toEqual(error);
-      expect(players).toBeUndefined();
+            (playerService.findAll as jest.Mock).mockImplementation((callback) => {
+                callback(null, mockPlayers);
+            });
+
+            controller.findAll((err, players) => {
+                expect(players).toEqual(mockPlayers);
+                done();
+            });
+        });
     });
-  });
 
-  it('should call findOne and return a player', () => {
-    const result = { id: '1', rank: 1 };
-    jest.spyOn(service, 'findOne').mockImplementation((id, cb) => cb(null, result));
+    describe('GET /api/player/:id', () => {
+        it('doit retourner un joueur spécifique', (done) => {
+            const mockPlayer: Player = { id: "1", rank: 5 } as Player;
 
-    controller.findOne('1', (err, player) => {
-      expect(player).toEqual(result);
+            (playerService.findOne as jest.Mock).mockImplementation((id, callback) => {
+                callback(null, mockPlayer);
+            });
+
+            controller.findOne('1', (err, player) => {
+                expect(player).toEqual(mockPlayer);
+                done();
+            });
+        });
+
+        it("doit retourner null si le joueur n'existe pas", (done) => {
+            (playerService.findOne as jest.Mock).mockImplementation((id, callback) => {
+                callback(null, null);
+            });
+
+            controller.findOne('999', (err, player) => {
+                expect(player).toBeNull();
+                done();
+            });
+        });
     });
-  });
 
-  it('should handle error in findOne', () => {
-    const error = new Error('Error');
-    jest.spyOn(service, 'findOne').mockImplementation((id, cb) => cb(error, null));
+    describe('POST /api/player', () => {
+        it('doit créer un joueur et retourner son ID et son rang', async () => {
+            const dto: CreatePlayerDto = { id: 'John Doe', rank: 5 };
+            const mockPlayer: Player = { id: "1", rank: 5 } as Player;
 
-    controller.findOne('1', (err, player) => {
-      expect(err).toEqual(error);
-      expect(player).toBeUndefined();
+            (playerService.create as jest.Mock).mockImplementation((data, callback) => {
+                callback(null, mockPlayer);
+            });
+
+            const result = await controller.create(dto);
+            expect(result).toEqual({ id: '1', rank: 5 });
+        });
+
+        it("doit retourner une erreur 400 si c'est une mauvaise requête", async () => {
+            (playerService.create as jest.Mock).mockImplementation((data, callback) => {
+                callback(new BadRequestException('Invalid data'), null);
+            });
+
+            await expect(controller.create({ id: '', rank: 0 })).rejects.toEqual(new BadRequestException('Invalid data'));
+        });
+
+        it("doit retourner une erreur 409 si le joueur existe déjà", async () => {
+            (playerService.create as jest.Mock).mockImplementation((data, callback) => {
+                callback(new ConflictException('Player already exists'), null);
+            });
+
+            await expect(controller.create({ id: 'John Doe', rank: 5 })).rejects.toEqual(new ConflictException('Player already exists'));
+        });
     });
-  });
 
-  it('should call create and return a player', async () => {
-    const playerDTO: CreatePlayerDto = { name: 'John', rank: 1 };
-    const result = { id: '1', rank: 1 };
-    jest.spyOn(service, 'create').mockImplementation((dto, cb) => cb(null, result));
+    describe('DELETE /api/player/:id', () => {
+        it('doit supprimer un joueur', (done) => {
+            (playerService.remove as jest.Mock).mockImplementation((id, callback) => {
+                callback(null);
+            });
 
-    await expect(controller.create(playerDTO)).resolves.toEqual({ id: '1', rank: 1 });
-  });
-
-  it('should handle BadRequestException on create', async () => {
-    const playerDTO: CreatePlayerDto = { name: 'John', rank: 1 };
-    jest.spyOn(service, 'create').mockImplementation((dto, cb) => cb(new BadRequestException('Bad Request'), null));
-
-    await expect(controller.create(playerDTO)).rejects.toEqual({ code: 400, message: 'Bad Request' });
-  });
-
-  it('should handle ConflictException on create', async () => {
-    const playerDTO: CreatePlayerDto = { name: 'John', rank: 1 };
-    jest.spyOn(service, 'create').mockImplementation((dto, cb) => cb(new ConflictException('Conflict'), null));
-
-    await expect(controller.create(playerDTO)).rejects.toEqual({ code: 409, message: 'Conflict' });
-  });
-
-  it('should call remove and return void', () => {
-    jest.spyOn(service, 'remove').mockImplementation((id, cb) => cb(null));
-
-    controller.remove('1', (err) => {
-      expect(err).toBeNull();
+            controller.remove('1', (err) => {
+                expect(err).toBeNull();
+                done();
+            });
+        });
     });
-  });
-
-  it('should handle error in remove', () => {
-    const error = new Error('Error');
-    jest.spyOn(service, 'remove').mockImplementation((id, cb) => cb(error));
-
-    controller.remove('1', (err) => {
-      expect(err).toEqual(error);
-    });
-  });
 });

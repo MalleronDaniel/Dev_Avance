@@ -25,8 +25,8 @@ let PlayerService = class PlayerService {
     }
     findAll(callback) {
         this.playerRepository.find().then(players => {
-            if (players.length === 0) {
-                return callback(new common_1.BadRequestException("Le classement n'est pas disponible car aucun joueur n'existe"));
+            if (!players || players.length === 0) {
+                return callback(new common_1.NotFoundException("Le classement n'est pas disponible car aucun joueur n'existe"));
             }
             callback(null, players);
         }).catch(err => callback(err));
@@ -38,7 +38,7 @@ let PlayerService = class PlayerService {
         const player = new player_entity_1.Player();
         player.id = playerDTO.id;
         this.playerRepository.find().then(players => {
-            if (player.id === "") {
+            if (player.id == undefined || !player.id.trim()) {
                 return callback(new common_1.BadRequestException("L'identifiant du joueur n'est pas valide"));
             }
             if (players.find(p => p.id === player.id)) {
@@ -53,7 +53,7 @@ let PlayerService = class PlayerService {
                 player.rank = averageRank;
             }
             else {
-                player.rank = 0;
+                player.rank = 1000;
             }
             this.playerRepository.save(player).then(savedPlayer => { callback(null, savedPlayer); }).catch(err => callback(err));
             this.eventEmitter.emit('player.updated', player);
@@ -65,7 +65,7 @@ let PlayerService = class PlayerService {
     updateRank(id, rank, callback) {
         this.playerRepository.findOneBy({ id }).then(player => {
             if (!player) {
-                return callback(new common_1.HttpException('Joueur non trouvé', 404));
+                return callback(new common_1.BadRequestException('Joueur non trouvé'));
             }
             player.rank = rank;
             this.playerRepository.save(player).then(savedPlayer => callback(null, savedPlayer)).catch(err => callback(err));

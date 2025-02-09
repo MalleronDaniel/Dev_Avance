@@ -1,5 +1,5 @@
 import { MatchResultDTO, PublishMatchDto } from './dto/post-match.dto';
-import { PlayerService } from 'src/players/players.service';
+import { PlayerService } from '../players/players.service';
 export declare class MatchService {
     private playerService;
     constructor(playerService: PlayerService);

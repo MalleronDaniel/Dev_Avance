@@ -33,12 +33,11 @@ export class RankController {
         return new Promise((resolve, reject) => {
             this.playerService.findAll((err, players) => {
                 if (err) {
-                    if(err instanceof BadRequestException) {
-                        reject({"code":404 , "message": err.message});
-                    }
                     reject(err);
+                    return;
                 } else {
                     resolve(players!.sort((a, b) => b.rank - a.rank));
+                    return;
                 }
             });
         }

@@ -30,19 +30,10 @@ let PlayerController = class PlayerController {
         return new Promise((resolve, reject) => {
             this.playersService.create(playerDTO, (error, result) => {
                 if (error) {
-                    if (error instanceof common_1.BadRequestException) {
-                        reject({ "code": 400, "message": error.message });
-                    }
-                    else if (error instanceof common_1.ConflictException) {
-                        reject({ "code": 409, "message": error.message });
-                    }
-                    else {
-                        reject(error);
-                    }
+                    reject(error);
+                    return;
                 }
-                else {
-                    resolve({ "id": result.id, "rank": result.rank });
-                }
+                resolve({ id: result.id, rank: result.rank });
             });
         });
     }

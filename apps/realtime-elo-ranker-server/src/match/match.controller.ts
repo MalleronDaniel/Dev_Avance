@@ -10,13 +10,8 @@ export class MatchController {
     publish(@Body() matchDTO: PublishMatchDto) : Promise<MatchResultDTO> {
         return new Promise((resolve, reject) => {
             this.matchService.publish(matchDTO, (error, result) => {
-                console.log(matchDTO);
                 if (error) {
-                    if(error instanceof BadRequestException) {
-                        reject({"code": 422, "message": error.message});
-                    }else{
-                        reject(error);
-                    }
+                    reject(error);
                 } else {
                     if(result === undefined) {
                         reject({"code": 500, "message": "Internal server error"});

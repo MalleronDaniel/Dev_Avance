@@ -23,14 +23,8 @@ let MatchController = class MatchController {
     publish(matchDTO) {
         return new Promise((resolve, reject) => {
             this.matchService.publish(matchDTO, (error, result) => {
-                console.log(matchDTO);
                 if (error) {
-                    if (error instanceof common_1.BadRequestException) {
-                        reject({ "code": 422, "message": error.message });
-                    }
-                    else {
-                        reject(error);
-                    }
+                    reject(error);
                 }
                 else {
                     if (result === undefined) {

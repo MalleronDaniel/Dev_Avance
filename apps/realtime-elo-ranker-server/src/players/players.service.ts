@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Player } from '../typeorm/entities/player.entity';
@@ -15,8 +15,8 @@ export class PlayerService {
 
     findAll(callback: (err: any, players?: Player[]) => void): void {
         this.playerRepository.find().then(players => {
-            if (players.length === 0) {
-                return callback(new BadRequestException("Le classement n'est pas disponible car aucun joueur n'existe"));
+            if ( !players || players.length === 0) {
+                return callback(new NotFoundException("Le classement n'est pas disponible car aucun joueur n'existe"));
             }
             callback(null, players);
         }).catch(err => callback(err));
@@ -31,7 +31,7 @@ export class PlayerService {
         player.id = playerDTO.id;
 
         this.playerRepository.find().then(players => {
-            if (player.id === "") {
+            if (player.id == undefined || !player.id.trim()) {
                 return callback(new BadRequestException("L'identifiant du joueur n'est pas valide"));
             }
             if (players.find(p => p.id === player.id)) {
@@ -63,7 +63,7 @@ export class PlayerService {
     updateRank(id: string, rank: number, callback: (err: any, player?: Player) => void): void {
         this.playerRepository.findOneBy({ id }).then(player => {
             if (!player) {
-                return callback(new HttpException('Joueur non trouvé', 404));
+                return callback(new BadRequestException('Joueur non trouvé'));
             }
             player.rank = rank;
             this.playerRepository.save(player).then(savedPlayer => callback(null, savedPlayer)).catch(err => callback(err));

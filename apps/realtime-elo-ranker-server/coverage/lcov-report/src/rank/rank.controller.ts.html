@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40.9% </span>
+                <span class="strong">95.45% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/22</span>
+                <span class='fraction'>21/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">36.84% </span>
+                <span class="strong">94.73% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/19</span>
+                <span class='fraction'>18/19</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,8 +109,7 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -120,14 +119,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -142,15 +141,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -166,15 +164,15 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 &nbsp;
 @Controller('api/ranking')
 export class RankController {
-<span class="fstat-no" title="function not covered" >    constructor(</span>
-        private readonly <span class="cstat-no" title="statement not covered" >playerService: P</span>layerService,
-        private <span class="cstat-no" title="statement not covered" >eventEmitter: E</span>ventEmitter2,
+    constructor(
+        private readonly playerService: PlayerService,
+        private eventEmitter: EventEmitter2,
     ) {}
 &nbsp;
     @Sse('/events')
-<span class="fstat-no" title="function not covered" >    sse(</span>): Observable&lt;MessageEvent&gt; {
-<span class="cstat-no" title="statement not covered" >        console.log('Catch SSE');</span>
-<span class="cstat-no" title="statement not covered" >        return fromEvent(this.eventEmitter, 'player.updated').pipe(</span>
+    sse(): Observable&lt;MessageEvent&gt; {
+        console.log('Catch SSE');
+        return fromEvent(this.eventEmitter, 'player.updated').pipe(
             map(<span class="fstat-no" title="function not covered" >(p</span>layer: Player) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
                 data: {
                     type: 'RankingUpdate',
@@ -188,16 +186,15 @@ export class RankController {
     }
 &nbsp;
     @Get()
-<span class="fstat-no" title="function not covered" >    async </span>ranking(): Promise&lt;Player[]&gt; {
-<span class="cstat-no" title="statement not covered" >        return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            this.playerService.findAll(<span class="fstat-no" title="function not covered" >(e</span>rr, players) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                if (err) {</span>
-<span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err instanceof BadRequestException) {</span>
-<span class="cstat-no" title="statement not covered" >                        reject({"code":404 , "message": err.message});</span>
-                    }
-<span class="cstat-no" title="statement not covered" >                    reject(err);</span>
+    async ranking(): Promise&lt;Player[]&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            this.playerService.findAll((err, players) =&gt; {
+                if (err) {
+                    reject(err);
+                    return;
                 } else {
-<span class="cstat-no" title="statement not covered" >                    resolve(players!.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.rank - a.rank)</span>);</span>
+                    resolve(players!.sort((a, b) =&gt; b.rank - a.rank));
+                    return;
                 }
             });
         }
@@ -211,7 +208,7 @@ export class RankController {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-06T11:24:56.392Z
+                at 2025-02-09T22:48:06.225Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

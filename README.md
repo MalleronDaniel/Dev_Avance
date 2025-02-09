@@ -1,5 +1,7 @@
 # Realtime Elo Ranker
 
+Pour plus de détails sur le rendu, veuillez consulter le fichier [rendu.md](./rendu.md).
+
 Realtime Elo Ranker est une application web permettant de simuler des matchs entre des joueurs et de calculer et afficher leur classement Elo en temps réel.
 
 ## Conteneurs Métiers
